@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Công cụ Thiết kế Solar + BESS | NVH Energy</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#0F6E56;--primary-light:#1D9E75;--primary-bg:#E1F5EE;
+    --accent:#BA7517;--accent-bg:#FAEEDA;
+    --text:#1a1a1a;--text-muted:#666;--text-hint:#999;
+    --bg:#f8f9fa;--surface:#fff;--surface2:#f2f4f6;
+    --border:#e2e8e4;--border2:#c8d4cf;
+    --shadow:0 2px 12px rgba(0,0,0,.08);
+    --radius:12px;--radius-sm:8px;
+  }
+  body{font-family:'Be Vietnam Pro',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+  /* HEADER */
+  header{background:var(--primary);color:#fff;padding:0 2rem}
+  .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+  .logo-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .badge{font-size:11px;background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-weight:400}
+
+  /* HERO STRIP */
+  .hero{background:linear-gradient(135deg,#0F6E56 0%,#1D9E75 100%);color:#fff;padding:2.5rem 2rem;text-align:center}
+  .hero h1{font-size:28px;font-weight:700;margin-bottom:.5rem}
+  .hero p{font-size:15px;opacity:.85;max-width:600px;margin:0 auto}
+
+  /* MAIN LAYOUT */
+  .container{max-width:1200px;margin:0 auto;padding:2rem}
+  .grid-2{display:grid;grid-template-columns:380px 1fr;gap:1.5rem;align-items:start}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
+  .card-title{font-size:15px;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;color:var(--primary)}
+  .card-title i{font-size:18px}
+
+  /* FORM */
+  .field{margin-bottom:1.25rem}
+  label{display:block;font-size:13px;font-weight:500;color:var(--text-muted);margin-bottom:6px}
+  select,input[type=number]{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;background:var(--surface);color:var(--text);transition:border .2s}
+  select:focus,input:focus{outline:none;border-color:var(--primary)}
+  .input-unit{position:relative}
+  .input-unit input{padding-right:48px}
+  .unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-hint);font-weight:500;pointer-events:none}
+
+  /* SLIDER */
+  .slider-wrap{display:flex;align-items:center;gap:12px;margin-top:8px}
+  input[type=range]{flex:1;height:4px;cursor:pointer;accent-color:var(--primary)}
+  .slider-val{font-size:14px;font-weight:600;color:var(--primary);min-width:60px;text-align:right}
+
+  /* TOGGLE PILLS */
+  .pill-group{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{padding:6px 14px;border:1px solid var(--border2);border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s;background:transparent;font-family:inherit;color:var(--text-muted)}
+  .pill.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+  /* CALC BUTTON */
+  .btn-calc{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-calc:hover{background:var(--primary-light)}
+
+  /* RESULT AREA */
+  .result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+  .result-title{font-size:16px;font-weight:600;color:var(--text)}
+  .region-badge{font-size:12px;background:var(--primary-bg);color:var(--primary);padding:4px 12px;border-radius:20px;font-weight:500}
+
+  /* METRIC CARDS */
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+  .metric{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px}
+  .metric-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  .metric-value{font-size:22px;font-weight:700;color:var(--text)}
+  .metric-unit{font-size:12px;color:var(--text-muted);font-weight:400}
+  .metric.highlight .metric-value{color:var(--primary)}
+  .metric.accent .metric-value{color:var(--accent)}
+
+  /* BESS TABLE */
+  .bess-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1.5rem}
+  .bess-table th{background:var(--primary-bg);color:var(--primary);padding:8px 12px;text-align:left;font-weight:600}
+  .bess-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+  .bess-table tr:last-child td{border-bottom:none}
+  .bess-table tr:hover td{background:var(--surface2)}
+  .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+  .tag-day{background:#E1F5EE;color:#0F6E56}
+  .tag-night{background:#E6F1FB;color:#185FA5}
+
+  /* CHART */
+  .chart-wrap{position:relative;height:220px;margin-bottom:1rem}
+
+  /* PAYBACK SECTION */
+  .payback-strip{background:var(--accent-bg);border-radius:var(--radius-sm);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}
+  .payback-left span{font-size:12px;color:var(--accent);font-weight:500}
+  .payback-left p{font-size:24px;font-weight:700;color:var(--text)}
+  .payback-info{font-size:12px;color:var(--text-muted);text-align:right;max-width:220px}
+
+  /* FINANCIAL TABLE */
+  .fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px}
+  .fin-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)}
+  .fin-row:last-child{border-bottom:none}
+  .fin-label{color:var(--text-muted)}
+  .fin-val{font-weight:600;color:var(--text)}
+
+  /* DISCLAIMER */
+  .disclaimer{font-size:11px;color:var(--text-hint);margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border);line-height:1.6}
+
+  /* EMPTY STATE */
+  .empty{text-align:center;padding:3rem 2rem;color:var(--text-muted)}
+  .empty i{font-size:48px;color:var(--border2);display:block;margin-bottom:1rem}
+  .empty p{font-size:14px}
+
+  /* PROVINCE SEARCH */
+  .search-wrap{position:relative}
+  .search-wrap input{padding-left:36px}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-hint);font-size:16px}
+
+  /* HOURLY CHART TOGGLE */
+  .tab-bar{display:flex;gap:2px;background:var(--surface2);border-radius:var(--radius-sm);padding:3px;margin-bottom:1rem}
+  .tab{flex:1;text-align:center;padding:6px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text-muted);transition:all .2s}
+  .tab.active{background:var(--surface);color:var(--primary);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+  @media(max-width:800px){
+    .grid-2{grid-template-columns:1fr}
+    .metrics{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-solar-panel" style="font-size:20px;color:#fff"></i></div>
+      NVH Energy — Solar + BESS
+    </div>
+    <span class="badge">Công cụ thiết kế hệ thống điện mặt trời</span>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Thiết kế hệ thống Solar + BESS</h1>
+  <p>Nhập sản lượng điện tiêu thụ để nhận tư vấn công suất lắp đặt và lưu trữ tối ưu cho gia đình bạn</p>
+</div>
+
+<div class="container">
+  <div class="grid-2">
+
+    <!-- LEFT PANEL: INPUT -->
+    <div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-settings-2"></i> Thông số đầu vào</div>
+
+        <div class="field">
+          <label>Khu vực / Tỉnh thành</label>
+          <select id="region" onchange="onRegionChange()">
+            <option value="">— Chọn khu vực —</option>
+            <optgroup label="TP. Hồ Chí Minh & vùng lân cận">
+              <option value="tphcm" data-pv="1426" data-sun="4.217" data-region="TP. Hồ Chí Minh">Hồ Chí Minh</option>
+              <option value="dongnai" data-pv="1570" data-sun="4.376" data-region="Đồng Nai - Bình Phước">Đồng Nai / Bình Phước</option>
+              <option value="tayninh" data-pv="1397" data-sun="4.297" data-region="Tây Ninh">Tây Ninh</option>
+            </optgroup>
+            <optgroup label="Miền Tây Nam Bộ">
+              <option value="mientay" data-pv="1362" data-sun="4.13" data-region="Miền Tây">Đồng Tháp / An Giang</option>
+              <option value="cantho" data-pv="1277" data-sun="3.94" data-region="Miền Tây">Cần Thơ / Vĩnh Long</option>
+              <option value="camau" data-pv="1247" data-sun="3.94" data-region="Miền Tây">Cà Mau</option>
+            </optgroup>
+            <optgroup label="Miền Trung – Tây Nguyên">
+              <option value="danang" data-pv="1370" data-sun="4.163" data-region="Miền Trung - Tây Nguyên">Đà Nẵng</option>
+              <option value="hue" data-pv="1278" data-sun="4.163" data-region="Miền Trung - Tây Nguyên">Huế / Quảng Trị</option>
+              <option value="khanhhoa" data-pv="1575" data-sun="4.544" data-region="Miền Trung - Tây Nguyên">Khánh Hòa</option>
+              <option value="gialai" data-pv="1496" data-sun="4.118" data-region="Miền Trung - Tây Nguyên">Gia Lai / Đăk Lăk</option>
+              <option value="lamdong" data-pv="1583" data-sun="4.395" data-region="Miền Trung - Tây Nguyên">Lâm Đồng</option>
+            </optgroup>
+            <optgroup label="Miền Bắc">
+              <option value="hanoi" data-pv="912" data-sun="3.437" data-region="Miền Bắc (Nhóm 4)">Hà Nội</option>
+              <option value="haiphong" data-pv="902" data-sun="3.437" data-region="Miền Bắc (Nhóm 4)">Hải Phòng / Hưng Yên</option>
+              <option value="quangninh" data-pv="977" data-sun="3.437" data-region="Miền Bắc (Nhóm 4)">Quảng Ninh</option>
+              <option value="nghean" data-pv="1269" data-sun="3.521" data-region="Miền Bắc (Nhóm 4)">Nghệ An / Hà Tĩnh</option>
+              <option value="sonla" data-pv="1411" data-sun="3.437" data-region="Miền Bắc (Nhóm 3)">Sơn La / Điện Biên / Lai Châu</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Sản lượng tiêu thụ mỗi tháng</label>
+          <div class="input-unit">
+            <input type="number" id="consumption" min="100" max="3000" step="50" value="600" onchange="updateSlider()">
+            <span class="unit">kWh/tháng</span>
+          </div>
+          <div class="slider-wrap">
+            <input type="range" id="consumptionSlider" min="100" max="2000" step="50" value="600" oninput="updateFromSlider()">
+            <span class="slider-val" id="sliderDisplay">600 kWh</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Tỷ lệ sử dụng điện ban ngày</label>
+          <div class="pill-group" id="dayRatio">
+            <button class="pill" onclick="setRatio('70')" data-ratio="70">70% ngày / 30% đêm</button>
+            <button class="pill active" onclick="setRatio('50')" data-ratio="50">50% ngày / 50% đêm</button>
+            <button class="pill" onclick="setRatio('30')" data-ratio="30">30% ngày / 70% đêm</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Suất đầu tư (đ/kWp)</label>
+          <div class="input-unit">
+            <input type="number" id="costPerKwp" value="15000000" step="500000">
+            <span class="unit">đ/kWp</span>
+          </div>
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">
+          <i class="ti ti-calculator"></i> Tính toán ngay
+        </button>
+      </div>
+
+      <!-- QUICK INFO CARD -->
+      <div class="card" style="margin-top:1rem">
+        <div class="card-title"><i class="ti ti-info-circle"></i> Hướng dẫn nhanh</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.8">
+          <p>① Chọn tỉnh thành / khu vực lắp đặt</p>
+          <p>② Nhập sản lượng điện tiêu thụ từ hóa đơn điện</p>
+          <p>③ Chọn tỷ lệ sử dụng ngày/đêm theo thói quen sinh hoạt</p>
+          <p>④ Nhấn tính toán để xem kết quả đề xuất</p>
+          <p style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+            <strong>Dung lượng BESS:</strong> 1 bộ = 5 kWh | Inverter 1 pha: 5–12 kW | 3 pha: 15–30 kW
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: RESULTS -->
+    <div id="results">
+      <div class="card">
+        <div class="empty">
+          <i class="ti ti-solar-panel-2"></i>
+          <p>Nhập thông số và nhấn <strong>Tính toán ngay</strong> để xem kết quả đề xuất thiết kế</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const DATA = {
+  tphcm:    {table:'tphcm',   pv:1426, sun:4.217, label:'TP. Hồ Chí Minh'},
+  dongnai:  {table:'dongnai', pv:1570, sun:4.376, label:'Đồng Nai / Bình Phước'},
+  tayninh:  {table:'tphcm',   pv:1397, sun:4.297, label:'Tây Ninh'},
+  mientay:  {table:'mientay', pv:1362, sun:4.13,  label:'Đồng Tháp / An Giang'},
+  cantho:   {table:'mientay', pv:1277, sun:3.94,  label:'Cần Thơ / Vĩnh Long'},
+  camau:    {table:'mientay', pv:1247, sun:3.94,  label:'Cà Mau'},
+  danang:   {table:'mienTrung',pv:1370,sun:4.163, label:'Đà Nẵng'},
+  hue:      {table:'mienTrung',pv:1278,sun:4.163, label:'Huế / Quảng Trị'},
+  khanhhoa: {table:'mienTrung',pv:1575,sun:4.544, label:'Khánh Hòa'},
+  gialai:   {table:'mienTrung',pv:1496,sun:4.118, label:'Gia Lai / Đăk Lăk'},
+  lamdong:  {table:'mienTrung',pv:1583,sun:4.395, label:'Lâm Đồng'},
+  hanoi:    {table:'nhom4',    pv:912, sun:3.437, label:'Hà Nội'},
+  haiphong: {table:'nhom4',    pv:902, sun:3.437, label:'Hải Phòng / Hưng Yên'},
+  quangninh:{table:'nhom4',    pv:977, sun:3.437, label:'Quảng Ninh'},
+  nghean:   {table:'nhom4',    pv:1269,sun:3.521, label:'Nghệ An / Hà Tĩnh'},
+  sonla:    {table:'nhom3',    pv:1411,sun:3.437, label:'Sơn La / Điện Biên'}
+};
+
+// Lookup tables extracted from Excel: [kwh/month] => {solar, bess70, bess50, bess30, payback, area, inverter}
+const TABLES = {
+  tphcm: [
+    {kwh:100, solar:1.1, bess70:2, bess50:3, bess30:3, payback:6.31, area:2.9, inv:3},
+    {kwh:200, solar:2.1, bess70:4, bess50:5, bess30:6, payback:5.53, area:5.5, inv:5},
+    {kwh:300, solar:3.2, bess70:6, bess50:5, bess30:10, payback:5.01, area:8.3, inv:5},
+    {kwh:400, solar:4.3, bess70:7, bess50:10, bess30:13, payback:4.63, area:11.2, inv:6},
+    {kwh:500, solar:5.3, bess70:9, bess50:12, bess30:16, payback:4.32, area:13.8, inv:8},
+    {kwh:600, solar:6.4, bess70:11, bess50:15, bess30:19, payback:4.19, area:16.6, inv:10},
+    {kwh:700, solar:7.5, bess70:13, bess50:18, bess30:22, payback:4.11, area:19.5, inv:10},
+    {kwh:800, solar:8.5, bess70:15, bess50:20, bess30:25, payback:4.00, area:22.1, inv:12},
+    {kwh:900, solar:9.6, bess70:17, bess50:23, bess30:29, payback:3.96, area:25.0, inv:12},
+    {kwh:1000,solar:10.7,bess70:18, bess50:25, bess30:32, payback:3.93, area:27.8, inv:12},
+    {kwh:1100,solar:11.7,bess70:20, bess50:27, bess30:35, payback:3.87, area:30.4, inv:12},
+    {kwh:1200,solar:12.8,bess70:22, bess50:30, bess30:38, payback:3.86, area:33.3, inv:12},
+    {kwh:1300,solar:13.9,bess70:24, bess50:33, bess30:41, payback:3.84, area:36.1, inv:12},
+    {kwh:1400,solar:14.9,bess70:26, bess50:35, bess30:44, payback:3.80, area:38.7, inv:12},
+    {kwh:1500,solar:16.0,bess70:28, bess50:38, bess30:48, payback:3.79, area:41.6, inv:12},
+    {kwh:1600,solar:17.1,bess70:29, bess50:40, bess30:51, payback:3.79, area:44.5, inv:15},
+    {kwh:1700,solar:18.1,bess70:31, bess50:42, bess30:54, payback:3.76, area:47.1, inv:15},
+    {kwh:1800,solar:19.2,bess70:33, bess50:45, bess30:57, payback:3.75, area:49.9, inv:15},
+    {kwh:1900,solar:20.3,bess70:35, bess50:48, bess30:60, payback:3.75, area:52.8, inv:15},
+    {kwh:2000,solar:21.3,bess70:37, bess50:50, bess30:63, payback:3.73, area:55.4, inv:15}
+  ],
+  dongnai: [
+    {kwh:100, solar:1.0, bess70:2, bess50:2, bess30:3, payback:5.74, area:3.0, inv:3},
+    {kwh:200, solar:1.9, bess70:3, bess50:4, bess30:5, payback:5.00, area:5.0, inv:3},
+    {kwh:300, solar:2.9, bess70:4, bess50:6, bess30:8, payback:4.54, area:8.0, inv:5},
+    {kwh:400, solar:3.9, bess70:6, bess50:9, bess30:11, payback:4.20, area:11.0, inv:5},
+    {kwh:500, solar:4.8, bess70:7, bess50:10, bess30:14, payback:3.91, area:13.0, inv:6},
+    {kwh:600, solar:5.8, bess70:9, bess50:13, bess30:17, payback:3.80, area:16.0, inv:8},
+    {kwh:700, solar:6.8, bess70:10, bess50:15, bess30:20, payback:3.73, area:18.0, inv:8},
+    {kwh:800, solar:7.7, bess70:11, bess50:17, bess30:22, payback:3.62, area:21.0, inv:10},
+    {kwh:900, solar:8.7, bess70:13, bess50:19, bess30:25, payback:3.59, area:23.0, inv:10},
+    {kwh:1000,solar:9.7, bess70:15, bess50:21, bess30:28, payback:3.56, area:26.0, inv:12},
+    {kwh:1100,solar:10.7,bess70:16, bess50:23, bess30:31, payback:3.54, area:28.0, inv:12},
+    {kwh:1200,solar:11.6,bess70:17, bess50:25, bess30:33, payback:3.49, area:31.0, inv:12},
+    {kwh:1300,solar:12.6,bess70:19, bess50:28, bess30:36, payback:3.48, area:33.0, inv:12},
+    {kwh:1400,solar:13.6,bess70:20, bess50:30, bess30:39, payback:3.47, area:36.0, inv:12},
+    {kwh:1500,solar:14.5,bess70:22, bess50:32, bess30:42, payback:3.44, area:38.0, inv:12},
+    {kwh:1600,solar:15.5,bess70:23, bess50:34, bess30:45, payback:3.43, area:41.0, inv:15},
+    {kwh:1700,solar:16.5,bess70:25, bess50:36, bess30:47, payback:3.43, area:43.0, inv:15},
+    {kwh:1800,solar:17.4,bess70:26, bess50:38, bess30:50, payback:3.40, area:46.0, inv:15},
+    {kwh:1900,solar:18.4,bess70:28, bess50:40, bess30:53, payback:3.40, area:48.0, inv:15},
+    {kwh:2000,solar:19.4,bess70:29, bess50:42, bess30:56, payback:3.40, area:51.0, inv:15}
+  ],
+  mientay: [
+    {kwh:100, solar:1.2, bess70:2, bess50:3, bess30:4, payback:6.89, area:3.1, inv:3},
+    {kwh:200, solar:2.3, bess70:4, bess50:6, bess30:7, payback:6.05, area:6.0, inv:5},
+    {kwh:300, solar:3.5, bess70:7, bess50:9, bess30:11, payback:5.48, area:9.1, inv:6},
+    {kwh:400, solar:4.6, bess70:9, bess50:11, bess30:14, payback:4.95, area:12.0, inv:8},
+    {kwh:500, solar:5.8, bess70:11, bess50:14, bess30:18, payback:4.73, area:15.1, inv:10},
+    {kwh:600, solar:6.9, bess70:13, bess50:17, bess30:21, payback:4.52, area:17.9, inv:10},
+    {kwh:700, solar:8.1, bess70:15, bess50:20, bess30:25, payback:4.44, area:21.1, inv:12},
+    {kwh:800, solar:9.2, bess70:17, bess50:23, bess30:28, payback:4.33, area:23.9, inv:12},
+    {kwh:900, solar:10.4,bess70:20, bess50:26, bess30:32, payback:4.29, area:27.0, inv:12},
+    {kwh:1000,solar:11.5,bess70:22, bess50:28, bess30:35, payback:4.22, area:29.9, inv:12},
+    {kwh:1100,solar:12.7,bess70:24, bess50:31, bess30:39, payback:4.20, area:33.0, inv:12},
+    {kwh:1200,solar:13.8,bess70:26, bess50:34, bess30:42, payback:4.16, area:35.9, inv:12},
+    {kwh:1300,solar:15.0,bess70:28, bess50:37, bess30:46, payback:4.14, area:39.0, inv:12},
+    {kwh:1400,solar:16.1,bess70:30, bess50:40, bess30:49, payback:4.11, area:41.9, inv:12},
+    {kwh:1500,solar:17.3,bess70:33, bess50:43, bess30:53, payback:4.10, area:45.0, inv:12},
+    {kwh:1600,solar:18.4,bess70:35, bess50:45, bess30:56, payback:4.07, area:47.8, inv:15},
+    {kwh:1700,solar:19.6,bess70:37, bess50:48, bess30:60, payback:4.07, area:51.0, inv:15},
+    {kwh:1800,solar:20.7,bess70:39, bess50:51, bess30:63, payback:4.05, area:53.8, inv:15},
+    {kwh:1900,solar:21.9,bess70:41, bess50:54, bess30:67, payback:4.05, area:56.9, inv:15},
+    {kwh:2000,solar:23.0,bess70:43, bess50:57, bess30:70, payback:4.03, area:59.8, inv:15}
+  ],
+  mienTrung: [
+    {kwh:100, solar:1.0, bess70:2, bess50:2, bess30:3, payback:5.74, area:2.6, inv:3},
+    {kwh:200, solar:2.0, bess70:3, bess50:4, bess30:6, payback:5.26, area:5.2, inv:3},
+    {kwh:300, solar:3.0, bess70:5, bess50:7, bess30:9, payback:4.70, area:7.8, inv:5},
+    {kwh:400, solar:4.0, bess70:6, bess50:9, bess30:12, payback:4.31, area:10.4, inv:5},
+    {kwh:500, solar:5.0, bess70:8, bess50:11, bess30:15, payback:4.07, area:13.0, inv:8},
+    {kwh:600, solar:6.0, bess70:9, bess50:13, bess30:17, payback:3.93, area:15.6, inv:8},
+    {kwh:700, solar:7.1, bess70:11, bess50:16, bess30:21, payback:3.89, area:18.5, inv:10},
+    {kwh:800, solar:8.1, bess70:13, bess50:18, bess30:24, payback:3.81, area:21.1, inv:10},
+    {kwh:900, solar:9.1, bess70:15, bess50:21, bess30:27, payback:3.76, area:23.7, inv:12},
+    {kwh:1000,solar:10.1,bess70:16, bess50:23, bess30:29, payback:3.71, area:26.3, inv:12},
+    {kwh:1100,solar:11.1,bess70:18, bess50:25, bess30:32, payback:3.67, area:28.9, inv:12},
+    {kwh:1200,solar:12.1,bess70:19, bess50:27, bess30:35, payback:3.64, area:31.5, inv:12},
+    {kwh:1300,solar:13.1,bess70:21, bess50:30, bess30:38, payback:3.62, area:34.1, inv:12},
+    {kwh:1400,solar:14.1,bess70:22, bess50:32, bess30:41, payback:3.60, area:36.7, inv:12},
+    {kwh:1500,solar:15.1,bess70:24, bess50:34, bess30:44, payback:3.58, area:39.3, inv:12},
+    {kwh:1600,solar:16.1,bess70:26, bess50:36, bess30:47, payback:3.57, area:41.9, inv:15},
+    {kwh:1700,solar:17.1,bess70:27, bess50:38, bess30:50, payback:3.55, area:44.5, inv:15},
+    {kwh:1800,solar:18.1,bess70:29, bess50:41, bess30:53, payback:3.54, area:47.1, inv:15},
+    {kwh:1900,solar:19.1,bess70:30, bess50:43, bess30:56, payback:3.53, area:49.7, inv:15},
+    {kwh:2000,solar:20.2,bess70:32, bess50:46, bess30:59, payback:3.54, area:52.5, inv:15}
+  ],
+  nhom3: [
+    {kwh:100, solar:1.1, bess70:2, bess50:3, bess30:3, payback:6.31, area:2.9, inv:3},
+    {kwh:200, solar:2.2, bess70:4, bess50:5, bess30:7, payback:5.79, area:5.7, inv:5},
+    {kwh:300, solar:3.3, bess70:6, bess50:8, bess30:10, payback:5.16, area:8.6, inv:5},
+    {kwh:400, solar:4.4, bess70:8, bess50:11, bess30:13, payback:4.74, area:11.4, inv:8},
+    {kwh:500, solar:5.5, bess70:10, bess50:13, bess30:16, payback:4.48, area:14.3, inv:8},
+    {kwh:600, solar:6.6, bess70:12, bess50:16, bess30:20, payback:4.32, area:17.2, inv:10},
+    {kwh:700, solar:7.7, bess70:14, bess50:18, bess30:23, payback:4.22, area:20.0, inv:12},
+    {kwh:800, solar:8.7, bess70:15, bess50:21, bess30:26, payback:4.10, area:22.6, inv:12},
+    {kwh:900, solar:9.8, bess70:17, bess50:23, bess30:29, payback:4.04, area:25.5, inv:12},
+    {kwh:1000,solar:10.9,bess70:19, bess50:26, bess30:33, payback:4.00, area:28.3, inv:12},
+    {kwh:1100,solar:12.0,bess70:21, bess50:29, bess30:36, payback:3.97, area:31.2, inv:12},
+    {kwh:1200,solar:13.1,bess70:23, bess50:31, bess30:39, payback:3.95, area:34.1, inv:12},
+    {kwh:1300,solar:14.2,bess70:25, bess50:34, bess30:42, payback:3.92, area:36.9, inv:12},
+    {kwh:1400,solar:15.3,bess70:27, bess50:36, bess30:46, payback:3.91, area:39.8, inv:12},
+    {kwh:1500,solar:16.4,bess70:29, bess50:39, bess30:49, payback:3.89, area:42.6, inv:12},
+    {kwh:1600,solar:17.5,bess70:31, bess50:42, bess30:52, payback:3.88, area:45.5, inv:15},
+    {kwh:1700,solar:18.6,bess70:33, bess50:44, bess30:56, payback:3.86, area:48.4, inv:15},
+    {kwh:1800,solar:19.7,bess70:35, bess50:47, bess30:59, payback:3.85, area:51.2, inv:15},
+    {kwh:1900,solar:20.8,bess70:37, bess50:50, bess30:62, payback:3.84, area:54.1, inv:15},
+    {kwh:2000,solar:21.9,bess70:39, bess50:52, bess30:66, payback:3.83, area:56.9, inv:15}
+  ],
+  nhom4: [
+    {kwh:100, solar:1.7, bess70:4, bess50:5, bess30:6, payback:9.76, area:4.4, inv:5},
+    {kwh:200, solar:3.3, bess70:8, bess50:10, bess30:11, payback:8.69, area:8.6, inv:8},
+    {kwh:300, solar:5.0, bess70:13, bess50:15, bess30:17, payback:7.83, area:13.0, inv:10},
+    {kwh:400, solar:6.7, bess70:17, bess50:20, bess30:22, payback:7.22, area:17.4, inv:12},
+    {kwh:500, solar:8.3, bess70:21, bess50:24, bess30:27, payback:6.76, area:21.6, inv:12},
+    {kwh:600, solar:10.0,bess70:25, bess50:29, bess30:33, payback:6.55, area:26.0, inv:12},
+    {kwh:700, solar:11.7,bess70:29, bess50:34, bess30:39, payback:6.41, area:30.4, inv:12},
+    {kwh:800, solar:13.3,bess70:33, bess50:39, bess30:44, payback:6.26, area:34.6, inv:12},
+    {kwh:900, solar:15.0,bess70:38, bess50:44, bess30:50, payback:6.19, area:39.0, inv:12},
+    {kwh:1000,solar:16.7,bess70:42, bess50:49, bess30:55, payback:6.14, area:43.4, inv:12},
+    {kwh:1100,solar:18.3,bess70:46, bess50:53, bess30:60, payback:6.06, area:47.6, inv:12},
+    {kwh:1200,solar:20.0,bess70:50, bess50:58, bess30:66, payback:6.02, area:52.0, inv:12},
+    {kwh:1300,solar:21.7,bess70:54, bess50:63, bess30:72, payback:6.00, area:56.4, inv:12},
+    {kwh:1400,solar:23.3,bess70:58, bess50:68, bess30:77, payback:5.95, area:60.6, inv:12},
+    {kwh:1500,solar:25.0,bess70:63, bess50:73, bess30:83, payback:5.93, area:65.0, inv:12},
+    {kwh:1600,solar:26.7,bess70:67, bess50:78, bess30:88, payback:5.91, area:69.4, inv:15},
+    {kwh:1700,solar:28.3,bess70:71, bess50:82, bess30:94, payback:5.88, area:73.6, inv:15},
+    {kwh:1800,solar:30.0,bess70:75, bess50:87, bess30:99, payback:5.87, area:78.0, inv:15},
+    {kwh:1900,solar:31.7,bess70:80, bess50:92, bess30:105,payback:5.86, area:82.4, inv:15},
+    {kwh:2000,solar:33.4,bess70:84, bess50:97, bess30:110,payback:5.85, area:86.8, inv:15}
+  ]
+};
+
+// Electricity price tiers Vietnam (VND/kWh)
+const TIERS = [
+  {to:50,  price:1984},
+  {to:100, price:2050},
+  {to:200, price:2380},
+  {to:300, price:2998},
+  {to:400, price:3350},
+  {to:Infinity,price:3460}
+];
+
+function calcElecBill(kwh) {
+  let bill=0, rem=kwh;
+  let prev=0;
+  for(const t of TIERS){
+    const band = t.to - prev;
+    const used = Math.min(rem, band);
+    bill += used * t.price;
+    rem -= used;
+    prev = t.to;
+    if(rem<=0) break;
+  }
+  return bill * 1.08; // VAT
+}
+
+function interpolate(table, kwh) {
+  if(kwh <= table[0].kwh) return table[0];
+  if(kwh >= table[table.length-1].kwh) return table[table.length-1];
+  for(let i=0;i<table.length-1;i++){
+    if(kwh >= table[i].kwh && kwh <= table[i+1].kwh){
+      const t = (kwh - table[i].kwh) / (table[i+1].kwh - table[i].kwh);
+      const lerp = (a,b) => a + t*(b-a);
+      return {
+        solar: lerp(table[i].solar, table[i+1].solar),
+        bess70: lerp(table[i].bess70, table[i+1].bess70),
+        bess50: lerp(table[i].bess50, table[i+1].bess50),
+        bess30: lerp(table[i].bess30, table[i+1].bess30),
+        payback: lerp(table[i].payback, table[i+1].payback),
+        area: lerp(table[i].area, table[i+1].area),
+        inv: table[i].inv
+      };
+    }
+  }
+}
+
+let currentRatio = '50';
+let chartInstance = null;
+
+function setRatio(r){
+  currentRatio = r;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-ratio="${r}"]`).classList.add('active');
+}
+
+function updateSlider(){
+  const v = parseInt(document.getElementById('consumption').value)||600;
+  document.getElementById('consumptionSlider').value = Math.min(v,2000);
+  document.getElementById('sliderDisplay').textContent = v + ' kWh';
+}
+function updateFromSlider(){
+  const v = document.getElementById('consumptionSlider').value;
+  document.getElementById('consumption').value = v;
+  document.getElementById('sliderDisplay').textContent = v + ' kWh';
+}
+function onRegionChange(){}
+
+function formatVND(n){return Math.round(n).toLocaleString('vi-VN') + ' đ'}
+function fmt1(n){return parseFloat(n.toFixed(1))}
+
+function calculate(){
+  const regionKey = document.getElementById('region').value;
+  if(!regionKey){alert('Vui lòng chọn khu vực!');return;}
+  const kwh = parseInt(document.getElementById('consumption').value)||600;
+  const costPerKwp = parseInt(document.getElementById('costPerKwp').value)||15000000;
+  const info = DATA[regionKey];
+  const tableKey = info.table;
+  const table = TABLES[tableKey];
+  const res = interpolate(table, kwh);
+
+  const bessKey = 'bess'+currentRatio;
+  const bessKwh = res[bessKey];
+  const bessUnits = Math.ceil(bessKwh / 5);
+  const actualBessKwh = bessUnits * 5;
+
+  const solarKwp = fmt1(res.solar);
+  const totalCost = solarKwp * costPerKwp;
+  const monthlyBill = calcElecBill(kwh);
+  // Annual solar production
+  const annualProd = solarKwp * info.pv;
+  // Monthly savings estimate (based on production vs bill ratio)
+  const savings_monthly = Math.min(monthlyBill * 0.88, monthlyBill);
+  const actualPayback = fmt1(totalCost / (savings_monthly * 12));
+
+  const inverterType = res.inv <= 12 ? '1 Pha' : '3 Pha';
+  const panels = Math.ceil(solarKwp * 1000 / 620);
+  const area = fmt1(res.area);
+
+  const ratioLabel = currentRatio==='70'?'70% ban ngày / 30% ban đêm':currentRatio==='50'?'50% ban ngày / 50% ban đêm':'30% ban ngày / 70% ban đêm';
+
+  // Build hourly data for HCM-like profile
+  const hours = [6,7,8,9,10,11,12,13,14,15,16,17];
+  const pvProfile = [0.07,0.30,0.51,0.67,0.76,0.80,0.79,0.73,0.63,0.47,0.26,0.05];
+  const loadProfile = new Array(12).fill(kwh/30/24);
+
+  const pvData = pvProfile.map(v => fmt1(v * solarKwp));
+  const loadData = loadProfile.map(v => fmt1(v));
+
+  document.getElementById('results').innerHTML = `
+    <div class="card">
+      <div class="result-header">
+        <span class="result-title">Kết quả đề xuất thiết kế</span>
+        <span class="region-badge"><i class="ti ti-map-pin" style="font-size:12px"></i> ${info.label}</span>
+      </div>
+
+      <div class="metrics">
+        <div class="metric highlight">
+          <div class="metric-label">Công suất Solar</div>
+          <div class="metric-value">${solarKwp} <span class="metric-unit">kWp</span></div>
+        </div>
+        <div class="metric accent">
+          <div class="metric-label">Lưu trữ BESS</div>
+          <div class="metric-value">${actualBessKwh} <span class="metric-unit">kWh</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Inverter Hybrid</div>
+          <div class="metric-value">${res.inv} <span class="metric-unit">kW · ${inverterType}</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Số tấm pin (620Wp)</div>
+          <div class="metric-value">${panels} <span class="metric-unit">tấm</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Diện tích tối thiểu</div>
+          <div class="metric-value">${area} <span class="metric-unit">m²</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Số giờ nắng TB/ngày</div>
+          <div class="metric-value">${info.sun} <span class="metric-unit">giờ</span></div>
+        </div>
+      </div>
+
+      <!-- BESS DETAIL TABLE -->
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
+        Chi tiết BESS theo kịch bản sử dụng
+      </div>
+      <table class="bess-table">
+        <thead><tr>
+          <th>Kịch bản</th>
+          <th>BESS đề xuất</th>
+          <th>Số bộ (5kWh/bộ)</th>
+          <th>Phù hợp với</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="tag tag-day">☀️ 70% ngày / 30% đêm</span></td>
+            <td><strong>${Math.round(res.bess70)} kWh</strong></td>
+            <td>${Math.ceil(res.bess70/5)} bộ</td>
+            <td>Ở nhà ban ngày, ít dùng tối</td>
+          </tr>
+          <tr style="${currentRatio==='50'?'background:var(--primary-bg)':''}">
+            <td><span class="tag tag-day">⚖️ 50% ngày / 50% đêm</span></td>
+            <td><strong>${Math.round(res.bess50)} kWh</strong> ${currentRatio==='50'?'✓':''}</td>
+            <td>${Math.ceil(res.bess50/5)} bộ</td>
+            <td>Sinh hoạt đều ngày và đêm</td>
+          </tr>
+          <tr style="${currentRatio==='30'?'background:var(--primary-bg)':''}">
+            <td><span class="tag tag-night">🌙 30% ngày / 70% đêm</span></td>
+            <td><strong>${Math.round(res.bess30)} kWh</strong> ${currentRatio==='30'?'✓':''}</td>
+            <td>${Math.ceil(res.bess30/5)} bộ</td>
+            <td>Đi làm ban ngày, dùng nhiều tối</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- HOURLY CHART -->
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
+        Biểu đồ sản lượng điện trong ngày
+      </div>
+      <div class="chart-wrap">
+        <canvas id="hourlyChart" role="img" aria-label="Biểu đồ sản lượng điện mặt trời theo giờ trong ngày"></canvas>
+      </div>
+
+      <!-- PAYBACK -->
+      <div class="payback-strip">
+        <div class="payback-left">
+          <span>⏱ Thời gian thu hồi vốn dự kiến</span>
+          <p>${actualPayback} năm</p>
+        </div>
+        <div class="payback-info">
+          Dựa trên tiết kiệm điện hàng tháng và mức đầu tư ban đầu. Thực tế có thể thay đổi theo giá điện.
+        </div>
+      </div>
+
+      <!-- FINANCIAL DETAIL -->
+      <div style="font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
+        Phân tích tài chính
+      </div>
+      <div class="fin-grid">
+        <div>
+          <div class="fin-row"><span class="fin-label">Hóa đơn điện hiện tại/tháng</span><span class="fin-val">${formatVND(monthlyBill)}</span></div>
+          <div class="fin-row"><span class="fin-label">Sản lượng điện tự sản xuất/năm</span><span class="fin-val">${Math.round(annualProd).toLocaleString()} kWh</span></div>
+          <div class="fin-row"><span class="fin-label">Tiết kiệm ước tính/tháng</span><span class="fin-val" style="color:var(--primary)">${formatVND(savings_monthly)}</span></div>
+        </div>
+        <div>
+          <div class="fin-row"><span class="fin-label">Suất đầu tư</span><span class="fin-val">${costPerKwp.toLocaleString()} đ/kWp</span></div>
+          <div class="fin-row"><span class="fin-label">Tổng vốn đầu tư dự kiến</span><span class="fin-val">${formatVND(totalCost)}</span></div>
+          <div class="fin-row"><span class="fin-label">PV Out khu vực</span><span class="fin-val">${info.pv} kWh/kWp/năm</span></div>
+        </div>
+      </div>
+
+      <p class="disclaimer">
+        ⚠️ Số liệu trên mang tính tham khảo và được tính toán dựa trên dữ liệu bức xạ mặt trời trung bình khu vực, biểu giá điện EVN 6 bậc hiện hành. 
+        Giá đầu tư thực tế có thể thay đổi tùy thuộc vào mặt bằng, hướng mái, thiết bị cụ thể. 
+        <strong>Liên hệ NVH Energy</strong>: (028) 3724 6889 | info@namviethung.com.vn để được tư vấn chính xác.
+      </p>
+    </div>
+  `;
+
+  // Draw chart
+  if(chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById('hourlyChart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: hours.map(h => h+':00'),
+      datasets: [
+        {
+          label: `Solar (${solarKwp} kWp)`,
+          data: pvData,
+          borderColor: '#1D9E75',
+          backgroundColor: 'rgba(29,158,117,.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3,
+          borderWidth: 2
+        },
+        {
+          label: 'Phụ tải trung bình',
+          data: loadData,
+          borderColor: '#BA7517',
+          borderDash: [5,3],
+          backgroundColor: 'rgba(186,117,23,.05)',
+          fill: false,
+          tension: 0,
+          pointRadius: 2,
+          borderWidth: 1.5
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        y: {
+          title: { display: true, text: 'kW', font: {size:11} },
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,.06)' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // custom legend
+  document.querySelector('.chart-wrap').insertAdjacentHTML('afterend',`
+    <div style="display:flex;gap:16px;font-size:12px;color:#666;margin-bottom:1.25rem;">
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:3px;background:#1D9E75;border-radius:2px;display:inline-block"></span>Solar (${solarKwp} kWp)</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:1px;background:#BA7517;border-top:1.5px dashed #BA7517;display:inline-block"></span>Phụ tải TB</span>
+    </div>
+  `);
+}
+
+// Init
+updateSlider();
+</script>
+</body>
+</html>
