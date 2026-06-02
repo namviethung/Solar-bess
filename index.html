@@ -1,0 +1,395 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#1D9E75;--g2:#0F6E56;--g3:#E1F5EE;--g4:#085041;
+  --a1:#BA7517;--a2:#FAEEDA;--a3:#412402;
+  --b1:#185FA5;--b2:#E6F1FB;--b3:#042C53;
+  --r1:#D85A30;--r2:#FAECE7;
+  --c0:#ffffff;--c1:#F8F9FA;--c2:#F1EFE8;--c3:#D3D1C7;
+  --c4:#B4B2A9;--c5:#888780;--c6:#5F5E5A;--c7:#2C2C2A;
+  --nav:#0b1e35;
+  --radius:10px;--radius-lg:14px;
+}
+html,body{font-size:13px;font-family:'Be Vietnam Pro',sans-serif;color:var(--c7)}
+.topnav{background:var(--nav);height:46px;display:flex;align-items:center;padding:0 14px;gap:10px;border-radius:10px 10px 0 0}
+.nav-logo-box{width:26px;height:26px;background:var(--g1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.nav-logo-text{color:#fff;font-weight:700;font-size:13px}
+.nav-logo-sub{color:rgba(255,255,255,.4);font-size:9px}
+.nav-spacer{flex:1}
+.nav-chip{background:rgba(29,158,117,.2);border:1px solid rgba(29,158,117,.4);color:#5DCAA5;font-size:10px;padding:2px 8px;border-radius:20px}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.65);font-family:inherit;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-btn.primary{background:var(--g1);border-color:var(--g1);color:#fff}
+.nav-btn.primary:hover{background:var(--g2)}
+.app-wrap{display:flex;min-height:600px;background:var(--c1);border-radius:0 0 10px 10px;overflow:hidden}
+.sidebar{width:270px;background:#fff;border-right:1px solid var(--c3);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;max-height:700px}
+.content{flex:1;overflow-y:auto;padding:14px;min-width:0;max-height:700px}
+.sb-section{border-bottom:1px solid var(--c2);padding:10px 12px}
+.sb-section-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--c5);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.sb-section-title span{font-size:11px}
+.cycle-toggle{display:flex;background:var(--c2);border-radius:7px;padding:3px;gap:2px;margin-bottom:4px}
+.cycle-btn{flex:1;padding:5px 6px;border:none;background:transparent;font-family:inherit;font-size:11px;font-weight:500;color:var(--c5);border-radius:5px;cursor:pointer;transition:all .15s}
+.cycle-btn.active{background:#fff;color:var(--g1);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
+.brand-card{border:1.5px solid var(--c3);border-radius:7px;padding:7px 8px;cursor:pointer;transition:all .15s}
+.brand-card.active{border-color:var(--g1);background:var(--g3)}
+.brand-card-name{font-size:11px;font-weight:600;color:var(--c7)}
+.brand-card-info{font-size:9px;color:var(--c5);margin-top:1px;font-family:monospace}
+.field{margin-bottom:6px}
+.field label{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:500;color:var(--c6);margin-bottom:3px}
+.field label .unit{font-size:9px;color:var(--c4);font-weight:400}
+.field input{width:100%;height:28px;padding:0 8px;border:1px solid var(--c3);border-radius:5px;font-family:inherit;font-size:11px;color:var(--c7);background:var(--c1);outline:none;transition:border .12s}
+.field input:focus{border-color:var(--g1);background:#fff}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.tariff-list{display:flex;flex-direction:column;gap:3px}
+.tariff-row{display:flex;align-items:center;gap:6px;padding:6px 7px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all .12s}
+.tariff-row:hover{background:var(--c1)}
+.tariff-row.active{background:var(--g3);border-color:var(--g1)}
+.tariff-row-name{font-size:11px;font-weight:500;flex:1;color:var(--c7)}
+.tariff-row-vals{font-family:monospace;font-size:9px;color:var(--c5)}
+.tariff-row.active .tariff-row-name{color:var(--g4)}
+.price-cells{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:6px}
+.price-cell{border:1px solid var(--c3);border-radius:6px;padding:6px;text-align:center}
+.price-cell-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.price-cell.peak .price-cell-label{color:var(--r1)}
+.price-cell.normal .price-cell-label{color:var(--a1)}
+.price-cell.off .price-cell-label{color:var(--b1)}
+.price-cell input{width:100%;border:none;background:transparent;font-family:monospace;font-size:12px;font-weight:500;text-align:center;outline:none;color:var(--c7)}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dash-title{font-size:15px;font-weight:700;color:var(--c7)}
+.dash-sub{font-size:10px;color:var(--c5);margin-top:1px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--g1);display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--c3);border-radius:var(--radius-lg);padding:11px 12px}
+.kpi-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--c5);margin-bottom:5px}
+.kpi-val{font-family:monospace;font-size:18px;font-weight:600;letter-spacing:-.5px;line-height:1}
+.kpi-val.green{color:var(--g4)}.kpi-val.amber{color:var(--a1)}.kpi-val.blue{color:var(--b1)}.kpi-val.red{color:var(--r1)}
+.kpi-unit{font-size:9px;color:var(--c5);margin-top:3px}
+.kpi-badge{display:inline-flex;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:4px}
+.kpi-badge.ok{background:var(--g3);color:var(--g4)}.kpi-badge.warn{background:var(--a2);color:var(--a3)}.kpi-badge.bad{background:var(--r2);color:var(--r1)}
+.panel{background:#fff;border:1px solid var(--c3);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden}
+.panel-head{padding:9px 12px;border-bottom:1px solid var(--c2);display:flex;align-items:center;justify-content:space-between}
+.panel-head-title{font-size:12px;font-weight:600;color:var(--c7)}
+.panel-head-sub{font-size:10px;color:var(--c5)}
+.panel-body{padding:10px 12px}
+.sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sys-box{background:var(--c1);border:1px solid var(--c3);border-radius:7px;padding:9px;text-align:center}
+.sys-box.h1{background:var(--g3);border-color:var(--g1)}
+.sys-box.h2{background:var(--a2);border-color:var(--a1)}
+.sys-box-icon{font-size:16px;margin-bottom:3px}
+.sys-box-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--c5);margin-bottom:1px}
+.sys-box.h1 .sys-box-label{color:var(--g2)}.sys-box.h2 .sys-box-label{color:var(--a1)}
+.sys-box-val{font-family:monospace;font-size:17px;font-weight:700;color:var(--c7)}
+.sys-box.h1 .sys-box-val{color:var(--g4)}.sys-box.h2 .sys-box-val{color:var(--a3)}
+.sys-box-unit{font-size:9px;color:var(--c5)}
+.pb-track{height:24px;background:var(--c2);border-radius:5px;overflow:hidden;margin:6px 0 3px}
+.pb-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pb-fill span{font-size:10px;font-weight:700;color:#fff;white-space:nowrap}
+.pb-marks{display:flex;justify-content:space-between;font-size:8px;color:var(--c4)}
+.dtable{width:100%;border-collapse:collapse;font-size:11px}
+.dtable th{text-align:left;padding:5px 8px;font-size:9px;font-weight:600;color:var(--c5);text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--c2)}
+.dtable th.r{text-align:right}
+.dtable td{padding:7px 8px;border-bottom:1px solid var(--c2);color:var(--c7)}
+.dtable tr:last-child td{border-bottom:none}
+.dtable .num{font-family:monospace;font-weight:500;text-align:right}
+.dtable .pos{color:var(--g4)}.dtable .neg{color:var(--r1)}.dtable .muted{color:var(--c5)}
+.ytable{width:100%;border-collapse:collapse;font-size:10px}
+.ytable th{background:var(--c1);padding:5px 7px;text-align:right;font-size:8px;font-weight:700;color:var(--c5);border-bottom:1px solid var(--c3);text-transform:uppercase;white-space:nowrap}
+.ytable th:first-child{text-align:left}
+.ytable td{padding:6px 7px;border-bottom:1px solid var(--c2);text-align:right;font-family:monospace;font-size:10px;white-space:nowrap}
+.ytable td:first-child{text-align:left;font-family:inherit;font-weight:600;color:var(--c6)}
+.ytable tr.recovered{background:rgba(29,158,117,.05)}
+.ytable .yp{color:var(--g4)}.ytable .yn{color:var(--r1)}
+.toast{position:fixed;bottom:16px;right:16px;background:var(--c7);color:#fff;font-size:11px;padding:8px 14px;border-radius:7px;z-index:9999;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.sb-footer{margin-top:auto;padding:10px 12px;border-top:1px solid var(--c2);background:var(--c1);font-size:9px;color:var(--c5);line-height:1.5}
+</style>
+
+<div style="border-radius:10px;overflow:hidden;border:1px solid var(--c3);box-shadow:0 4px 20px rgba(0,0,0,0.1)">
+<nav class="topnav">
+  <div class="nav-logo-box">☀️</div>
+  <div style="margin-left:6px">
+    <div class="nav-logo-text">Solar & BESS Pro</div>
+    <div class="nav-logo-sub">Công cụ thiết kế hệ thống lưu trữ năng lượng</div>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-chip">🇻🇳 EVN 2024</div>
+  <button class="nav-btn" onclick="saveP()">💾 Lưu</button>
+  <button class="nav-btn" onclick="loadP()">📂 Tải</button>
+  <button class="nav-btn primary" onclick="window.print()">📄 PDF</button>
+</nav>
+
+<div class="app-wrap">
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-section-title"><span>🔄</span> Chiến lược vận hành</div>
+      <div class="cycle-toggle">
+        <button class="cycle-btn" id="btn1" onclick="setCycle(1)">1 Chu kỳ/ngày</button>
+        <button class="cycle-btn active" id="btn2" onclick="setCycle(2)">2 Chu kỳ/ngày</button>
+      </div>
+      <div style="font-size:9px;color:var(--c5)" id="cnote">Sáng: nạp lưới thấp điểm + xả cao điểm · Chiều: Solar nạp + xả cao điểm</div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title"><span>🔋</span> Thông số BESS</div>
+      <div class="brand-grid">
+        <div class="brand-card active" id="bsig" onclick="setBrand('sig')"><div class="brand-card-name">Sigenergy</div><div class="brand-card-info">92.7%·97%·DOD 98%</div></div>
+        <div class="brand-card" id="both" onclick="setBrand('oth')"><div class="brand-card-name">Other</div><div class="brand-card-info">93%·93%·DOD 90%</div></div>
+      </div>
+      <div class="field"><label>Dung lượng BESS <span class="unit">kWh</span></label><input type="number" id="bkwh" value="1375" min="100" max="20000" step="25" oninput="rc()"></div>
+      <div class="field-row3">
+        <div class="field"><label>η sạc</label><input type="number" id="ec" value="0.927" min="0.7" max="1" step="0.001" oninput="rc()"></div>
+        <div class="field"><label>η xả</label><input type="number" id="ed" value="0.97" min="0.7" max="1" step="0.001" oninput="rc()"></div>
+        <div class="field"><label>DOD</label><input type="number" id="dod" value="0.98" min="0.5" max="1" step="0.01" oninput="rc()"></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title"><span>☀️</span> Thông số Solar</div>
+      <div class="field"><label>Solar phụ tải <span class="unit">kWp</span></label><input type="number" id="sl" value="350" min="0" max="10000" step="10" oninput="rc()"></div>
+      <div class="field-row">
+        <div class="field"><label>Giờ nắng <span class="unit">h/ngày</span></label><input type="number" id="psh" value="4.0" min="2" max="7" step="0.1" oninput="rc()"></div>
+        <div class="field"><label>Suy hao <span class="unit">%/năm</span></label><input type="number" id="sdg" value="2" min="0" max="5" step="0.1" oninput="rc()"></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title"><span>💡</span> Biểu giá EVN</div>
+      <div class="tariff-list">
+        <div class="tariff-row" id="tkd1" onclick="sT('kd1',5422,3152,1918)"><div class="tariff-row-name">Kinh doanh 1</div><div class="tariff-row-vals">5422·3152·1918</div></div>
+        <div class="tariff-row" id="tkd2" onclick="sT('kd2',5202,3108,1829)"><div class="tariff-row-name">Kinh doanh 2</div><div class="tariff-row-vals">5202·3108·1829</div></div>
+        <div class="tariff-row" id="tkd3" onclick="sT('kd3',5025,2887,1609)"><div class="tariff-row-name">Kinh doanh 3</div><div class="tariff-row-vals">5025·2887·1609</div></div>
+        <div class="tariff-row" id="tsx1" onclick="sT('sx1',3640,1987,1300)"><div class="tariff-row-name">Sản xuất 1</div><div class="tariff-row-vals">3640·1987·1300</div></div>
+        <div class="tariff-row" id="tsx2" onclick="sT('sx2',3508,1899,1234)"><div class="tariff-row-name">Sản xuất 2</div><div class="tariff-row-vals">3508·1899·1234</div></div>
+        <div class="tariff-row active" id="tsx3" onclick="sT('sx3',3398,1833,1190)"><div class="tariff-row-name">Sản xuất 3</div><div class="tariff-row-vals">3398·1833·1190</div></div>
+      </div>
+      <div class="price-cells">
+        <div class="price-cell peak"><div class="price-cell-label">Cao điểm</div><input type="number" id="pp" value="3398" oninput="rc()"></div>
+        <div class="price-cell normal"><div class="price-cell-label">Bình thường</div><input type="number" id="pn" value="1833" oninput="rc()"></div>
+        <div class="price-cell off"><div class="price-cell-label">Thấp điểm</div><input type="number" id="po" value="1190" oninput="rc()"></div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-title"><span>💰</span> Tài chính</div>
+      <div class="field-row">
+        <div class="field"><label>BESS <span class="unit">USD/kWh</span></label><input type="number" id="busd" value="110" min="50" max="500" step="5" oninput="rc()"></div>
+        <div class="field"><label>Tỷ giá <span class="unit">đ/USD</span></label><input type="number" id="ur" value="26400" step="100" oninput="rc()"></div>
+      </div>
+      <div class="field"><label>Solar <span class="unit">đ/kWp</span></label><input type="number" id="sp" value="6500000" step="100000" oninput="rc()"></div>
+      <div class="field-row">
+        <div class="field"><label>Ngày LV/năm</label><input type="number" id="wd" value="300" oninput="rc()"></div>
+        <div class="field"><label>Ngày CN/năm</label><input type="number" id="sd" value="52" oninput="rc()"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Lãi suất <span class="unit">%</span></label><input type="number" id="ir" value="9" min="0" max="20" step="0.5" oninput="rc()"></div>
+        <div class="field"><label>Thời gian vay <span class="unit">năm</span></label><input type="number" id="ly" value="7" min="1" max="15" oninput="rc()"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>O&M <span class="unit">%/năm</span></label><input type="number" id="om" value="1" min="0" max="5" step="0.1" oninput="rc()"></div>
+        <div class="field"><label>Tăng giá điện <span class="unit">%</span></label><input type="number" id="ei" value="3" min="0" max="10" step="0.5" oninput="rc()"></div>
+      </div>
+      <div class="field"><label>Chiết khấu NM <span class="unit">%</span></label><input type="number" id="dc" value="0" min="0" max="50" step="1" oninput="rc()"></div>
+    </div>
+    <div class="sb-footer">⚡ Tự động cập nhật · 📌 Tham khảo thiết kế sơ bộ</div>
+  </aside>
+
+  <main class="content" id="dash">
+    <div class="dash-header">
+      <div><div class="dash-title">Bảng phân tích hiệu quả đầu tư</div><div class="dash-sub"><span class="live-dot"></span>Live · <span id="clbl">2 chu kỳ/ngày</span> · <span id="blbl">Sigenergy</span></div></div>
+      <div style="font-size:10px;color:var(--c5)" id="ts"></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Hoàn vốn (đơn giản)</div><div class="kpi-val" id="kpb">—</div><div class="kpi-unit">năm, chưa tính lãi/O&M</div><div class="kpi-badge" id="kpbb">—</div></div>
+      <div class="kpi"><div class="kpi-label">Doanh thu / tháng</div><div class="kpi-val green" id="krm">—</div><div class="kpi-unit">triệu VNĐ/tháng</div></div>
+      <div class="kpi"><div class="kpi-label">Tổng vốn đầu tư</div><div class="kpi-val blue" id="kinv">—</div><div class="kpi-unit">tỷ VNĐ</div></div>
+      <div class="kpi"><div class="kpi-label">IRR 15 năm</div><div class="kpi-val" id="kirr">—</div><div class="kpi-unit">Internal Rate of Return</div><div class="kpi-badge" id="kirrb">—</div></div>
+      <div class="kpi"><div class="kpi-label">NPV</div><div class="kpi-val" id="knpv">—</div><div class="kpi-unit">tỷ VNĐ</div></div>
+      <div class="kpi"><div class="kpi-label">Năm hoàn vốn thực</div><div class="kpi-val" id="kbe">—</div><div class="kpi-unit">có lãi suất & O&M</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-head-title">⏱ Tiến trình hoàn vốn</div><div class="panel-head-sub" id="pblbl">—</div></div>
+      <div class="panel-body" style="padding-top:8px">
+        <div class="pb-track"><div class="pb-fill" id="pbf" style="width:0%;background:var(--g1)"><span id="pbt">—</span></div></div>
+        <div class="pb-marks"><span>0</span><span>3 năm</span><span>6 năm</span><span>9 năm</span><span>12 năm</span><span>15 năm</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-head-title">⚡ Quy mô hệ thống</div><div class="panel-head-sub" id="rtelbl">RTE = —%</div></div>
+      <div class="panel-body">
+        <div class="sys-grid">
+          <div class="sys-box"><div class="sys-box-icon">🏭</div><div class="sys-box-label">Solar phụ tải</div><div class="sys-box-val" id="ssload">—</div><div class="sys-box-unit">kWp</div></div>
+          <div class="sys-box h1"><div class="sys-box-icon">⚡</div><div class="sys-box-label">Solar sạc BESS</div><div class="sys-box-val" id="ssbess">—</div><div class="sys-box-unit">kWp</div></div>
+          <div class="sys-box h2"><div class="sys-box-icon">☀️</div><div class="sys-box-label">Tổng Solar</div><div class="sys-box-val" id="sstotal">—</div><div class="sys-box-unit">kWp</div></div>
+          <div class="sys-box"><div class="sys-box-icon">🔋</div><div class="sys-box-label">BESS</div><div class="sys-box-val" id="ssbkwh">—</div><div class="sys-box-unit">kWh</div></div>
+          <div class="sys-box h1"><div class="sys-box-icon">📤</div><div class="sys-box-label">Xả/ngày</div><div class="sys-box-val" id="ssdis">—</div><div class="sys-box-unit">kWh</div></div>
+          <div class="sys-box"><div class="sys-box-icon">📥</div><div class="sys-box-label">Nạp lưới/ngày</div><div class="sys-box-val" id="sschg">—</div><div class="sys-box-unit">kWh</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-head-title">📋 Phân tích doanh thu chi tiết</div></div>
+      <div class="panel-body" style="padding:0;overflow-x:auto"><table class="dtable"><thead><tr><th>Hạng mục</th><th class="r">Giá trị (đồng)</th><th>ĐVT</th><th>Ghi chú</th></tr></thead><tbody id="dtbody"></tbody></table></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-head-title">📈 Dòng tiền 15 năm</div>
+        <div style="display:flex;gap:10px">
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--c6)"><span style="width:8px;height:8px;border-radius:2px;background:var(--g1);display:inline-block"></span>Dòng tiền (tr.)</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--c6)"><span style="width:12px;height:2px;background:var(--b1);display:inline-block"></span>Tích lũy (tỷ)</span>
+        </div>
+      </div>
+      <div class="panel-body"><div style="position:relative;height:220px"><canvas id="cfc" role="img" aria-label="Dòng tiền 15 năm"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><div class="panel-head-title">📊 Bảng tổng hợp 15 năm</div><div class="panel-head-sub">Suy hao · O&M · Lãi suất · Thay thế</div></div>
+      <div class="panel-body" style="padding:0;overflow-x:auto"><table class="ytable"><thead><tr><th>Năm</th><th>DT (tr.)</th><th>O&M (tr.)</th><th>Lãi (tr.)</th><th>T.thế (tr.)</th><th>Dòng tiền (tr.)</th><th>Tích lũy (tỷ)</th></tr></thead><tbody id="ytbody"></tbody></table></div>
+    </div>
+    <div style="font-size:9px;color:var(--c5);margin-top:8px;text-align:center;padding-bottom:8px">Solar & BESS Pro · Biểu giá EVN 2024 · Kết quả mang tính chất tham khảo</div>
+  </main>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let CYC=2,chart=null;
+const G=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('vi-VN');
+const fM=n=>(n/1e6).toFixed(1);
+const fB=n=>(n/1e9).toFixed(3);
+
+function setCycle(n){
+  CYC=n;
+  G('btn1').classList.toggle('active',n===1);
+  G('btn2').classList.toggle('active',n===2);
+  G('cnote').textContent=n===1?'Sạc Solar 0 đồng + xả chiều cao điểm':'Sáng: nạp lưới thấp điểm + xả cao điểm · Chiều: Solar nạp + xả cao điểm';
+  G('clbl').textContent=n+' chu kỳ/ngày';
+  rc();
+}
+function setBrand(b){
+  G('bsig').classList.toggle('active',b==='sig');
+  G('both').classList.toggle('active',b==='oth');
+  if(b==='sig'){G('ec').value=0.927;G('ed').value=0.97;G('dod').value=0.98;}
+  else{G('ec').value=0.93;G('ed').value=0.93;G('dod').value=0.9;}
+  G('blbl').textContent=b==='sig'?'Sigenergy':'Other';
+  rc();
+}
+function sT(id,p,n,o){
+  document.querySelectorAll('.tariff-row').forEach(r=>r.classList.remove('active'));
+  G('t'+id).classList.add('active');
+  G('pp').value=p;G('pn').value=n;G('po').value=o;
+  rc();
+}
+function rc(){
+  const bk=+G('bkwh').value,ec=+G('ec').value,ed=+G('ed').value,dod=+G('dod').value;
+  const sl=+G('sl').value,psh=+G('psh').value,sdg=+G('sdg').value/100;
+  const pp=+G('pp').value,pn=+G('pn').value,po=+G('po').value;
+  const bu=+G('busd').value,ur=+G('ur').value,sp=+G('sp').value;
+  const wd=+G('wd').value,sd=+G('sd').value;
+  const ir=+G('ir').value/100,ly=+G('ly').value;
+  const om=+G('om').value/100,ei=+G('ei').value/100,dc=+G('dc').value/100;
+
+  const sfb=Math.round(bk*dod/(ec*psh)),ts=sl+sfb,rte=ec*ed;
+  const dpc=bk*dod*ed,cpc=bk*dod/ec;
+  const rc2=dpc*pp,rc1=dpc*pp,cc1=cpc*po;
+  let pd,rb;
+  if(CYC===1){pd=rc2;rb=rc2;}
+  else{pd=rc1+rc2-cc1;rb=rc1+rc2;}
+  const rsu=dpc*CYC*pn-cpc*po;
+  const wm=Math.round(wd/12),sm=Math.round(sd/12);
+  const pbm=pd*wm+rsu*sm;
+  const rsm=sl*psh*30*pn*(1-dc);
+  const trm=pbm+rsm;
+  const bi=bk*bu*ur,si=ts*sp,ic=200000000,ti=bi+si+ic;
+  const py=trm>0?ti/(trm*12):999;
+
+  let lb=ti,cc=-ti,be=null;
+  const yrs=[];
+  for(let y=1;y<=15;y++){
+    const em=Math.pow(1+ei,y-1),sd2=Math.pow(1-sdg,y-1),bd=y>1?Math.pow(.97,y-1):1;
+    const ar=trm*12*em*sd2*bd,oc=ti*om,rp=(y===5||y===10)?ti*.05:0;
+    let intc=0;
+    if(y<=ly&&ir>0){intc=lb*ir;lb=Math.max(0,lb-ti/ly);}
+    const tc=oc+rp+intc,nc=ar-tc;
+    cc+=nc;
+    if(cc>=0&&!be)be=y;
+    yrs.push({y,ar,oc,rp,intc,nc,cc});
+  }
+  function npv(r,cfs){return cfs.reduce((a,c,t)=>a+c/Math.pow(1+r,t),0);}
+  const cfs=[-ti,...yrs.map(y=>y.nc)];
+  let irr=.15;
+  for(let i=0;i<150;i++){
+    const n=npv(irr,cfs),d=cfs.reduce((a,c,t)=>a-t*c/Math.pow(1+irr,t+1),0);
+    if(Math.abs(d)<1e-10)break;irr-=n/d;if(irr<-.99){irr=-.99;break;}
+  }
+  const npvv=npv(ir||.09,cfs);
+
+  const pc=py<5?'green':py<8?'amber':'red';
+  G('kpb').className='kpi-val '+pc;G('kpb').textContent=py<100?py.toFixed(1):'> 15';
+  G('kpbb').className='kpi-badge '+(py<5?'ok':py<8?'warn':'bad');
+  G('kpbb').textContent=py<5?'✓ Rất tốt':py<7?'✓ Khả thi':py<10?'⚠ Xem xét':'✗ Khó khả thi';
+  G('krm').textContent=fM(trm);G('kinv').textContent=fB(ti);
+  G('kirr').className='kpi-val '+(irr>.15?'green':'amber');G('kirr').textContent=(irr*100).toFixed(1)+'%';
+  G('kirrb').className='kpi-badge '+(irr>.15?'ok':'warn');G('kirrb').textContent=irr>.15?'▲ Tốt':'▼ Thấp';
+  G('knpv').className='kpi-val '+(npvv>0?'green':'red');G('knpv').textContent=fB(npvv);
+  G('kbe').className='kpi-val '+(be&&be<=8?'green':'amber');G('kbe').textContent=be?'Năm '+be:'> 15 năm';
+
+  const pp2=Math.min(100,(py/15)*100);
+  G('pbf').style.width=pp2+'%';
+  G('pbf').style.background=pc==='green'?'var(--g1)':pc==='amber'?'var(--a1)':'var(--r1)';
+  G('pbt').textContent=py<100?py.toFixed(1)+' năm':'—';
+  G('pblbl').textContent=py<100?`${py.toFixed(1)} năm / 15 năm dự án`:'Không hoàn vốn trong 15 năm';
+  G('rtelbl').textContent=`RTE = ${(rte*100).toFixed(2)}% · BESS suy hao 3%/năm`;
+  G('ssload').textContent=sl;G('ssbess').textContent=sfb;G('sstotal').textContent=ts;
+  G('ssbkwh').textContent=bk;G('ssdis').textContent=Math.round(dpc*CYC);G('sschg').textContent=Math.round(cpc);
+
+  const rows=[
+    {l:'Dung lượng xả / chu kỳ',v:dpc.toFixed(1),u:'kWh',n:'BESS×DOD×η_xả',c:''},
+    {l:'Dung lượng nạp / chu kỳ',v:cpc.toFixed(1),u:'kWh',n:'BESS×DOD/η_sạc',c:''},
+    CYC===2?{l:'DT xả CK1 (sáng 6h-11h)',v:'+'+fmt(rc1),u:'đồng',n:'Xả cao điểm, đã nạp lưới',c:'pos'}:null,
+    {l:`DT xả CK${CYC} (chiều 17h30-22h30)`,v:'+'+fmt(rc2),u:'đồng',n:'Xả cao điểm, Solar nạp 0đ',c:'pos'},
+    CYC===2?{l:'Chi phí sạc lưới thấp điểm',v:'-'+fmt(cc1),u:'đồng',n:'Nạp 0h-6h',c:'neg'}:null,
+    {l:'Lợi nhuận BESS/ngày làm việc',v:'+'+fmt(pd),u:'đồng',n:'',c:'pos',b:1},
+    {l:'Doanh thu ngày Chủ Nhật',v:'+'+fmt(rsu),u:'đồng',n:'Xả giờ bình thường',c:'pos'},
+    {l:'DT BESS/tháng',v:'+'+fmt(pbm),u:'đồng',n:`${wm} ngày LV + ${sm} CN`,c:'pos'},
+    {l:'DT Solar/tháng (tiết kiệm)',v:'+'+fmt(rsm),u:'đồng',n:'Giờ bình thường',c:'pos'},
+    {l:'TỔNG DT/THÁNG',v:'+'+fmt(trm),u:'đồng',n:'',c:'pos',b:1},
+    {l:'Tổng DT/năm (năm 1)',v:'+'+fmt(trm*12),u:'đồng',n:'',c:'pos'},
+    {l:'Tổng vốn đầu tư',v:fmt(ti),u:'đồng',n:`BESS ${fB(bi)}B + Solar ${fB(si)}B`,c:''},
+  ].filter(Boolean);
+  G('dtbody').innerHTML=rows.map(r=>`<tr><td style="${r.b?'font-weight:600':''}">${r.l}</td><td class="num ${r.c}" style="${r.b?'font-weight:700':''}">${r.v}</td><td class="muted">${r.u}</td><td class="muted" style="font-size:9px">${r.n}</td></tr>`).join('');
+
+  G('ytbody').innerHTML=yrs.map(r=>`<tr class="${r.cc>=0?'recovered':''}"><td>Năm ${r.y}${r.cc>=0&&(r.y===1||yrs[r.y-2]?.cc<0)?' ✓':''}</td><td class="yp">${fM(r.ar)}</td><td class="yn">${fM(r.oc)}</td><td class="${r.intc>0?'yn':''}">${r.intc>0?fM(r.intc):'—'}</td><td class="${r.rp>0?'yn':''}">${r.rp>0?fM(r.rp):'—'}</td><td class="${r.nc>=0?'yp':'yn'}">${fM(r.nc)}</td><td class="${r.cc>=0?'yp':'yn'}">${fB(r.cc)}</td></tr>`).join('');
+
+  updChart(yrs);
+  G('ts').textContent='Cập nhật: '+new Date().toLocaleTimeString('vi-VN');
+}
+
+function updChart(yrs){
+  const ctx=G('cfc');if(!ctx)return;
+  const lb=yrs.map(y=>'N'+y.y);
+  const bd=yrs.map(y=>Math.round(y.nc/1e6));
+  const ld=yrs.map(y=>parseFloat((y.cc/1e9).toFixed(3)));
+  const bc=yrs.map(y=>y.nc>=0?'rgba(29,158,117,0.75)':'rgba(216,90,48,0.75)');
+  if(chart){chart.data.labels=lb;chart.data.datasets[0].data=bd;chart.data.datasets[0].backgroundColor=bc;chart.data.datasets[1].data=ld;chart.update('none');return;}
+  chart=new Chart(ctx,{data:{labels:lb,datasets:[{type:'bar',data:bd,backgroundColor:bc,borderRadius:3,yAxisID:'y'},{type:'line',data:ld,borderColor:'#185FA5',borderWidth:2,borderDash:[4,4],pointRadius:2,pointBackgroundColor:'#185FA5',fill:false,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:9},color:'#888'},grid:{display:false}},y:{ticks:{font:{size:9},color:'#888',callback:v=>v+'M'},grid:{color:'rgba(0,0,0,0.04)'}},y2:{position:'right',ticks:{font:{size:9},color:'#185FA5',callback:v=>v+'B'},grid:{display:false}}}}});
+}
+
+function saveP(){
+  const fs=['bkwh','ec','ed','dod','sl','psh','sdg','pp','pn','po','busd','ur','sp','wd','sd','ir','ly','om','ei','dc'];
+  const d={};fs.forEach(f=>d[f]=G(f).value);d.cyc=CYC;
+  try{localStorage.setItem('sbp',JSON.stringify(d));toast('✓ Đã lưu thông số');}catch(e){toast('⚠ Không thể lưu');}
+}
+function loadP(){
+  try{
+    const raw=localStorage.getItem('sbp');if(!raw){toast('Chưa có dữ liệu lưu');return;}
+    const d=JSON.parse(raw);
+    Object.entries(d).forEach(([k,v])=>{if(k!=='cyc'&&G(k))G(k).value=v;});
+    if(d.cyc)setCycle(+d.cyc);else rc();
+    toast('✓ Đã tải thông số đã lưu');
+  }catch(e){toast('⚠ Lỗi tải dữ liệu');}
+}
+function toast(msg){const t=G('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+document.querySelectorAll('#pp,#pn,#po').forEach(el=>el.addEventListener('input',()=>document.querySelectorAll('.tariff-row').forEach(r=>r.classList.remove('active'))));
+rc();
+</script>
